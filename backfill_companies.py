@@ -15,8 +15,8 @@ headers["Accept-Encoding"] = "deflate"
 headers["Accept-Language"]= "en-US,en;q=0.5"
 lines = []
 
-file_id="19Y_Oi5_riecwonPbtxN4sfDntZO62s_vJbXoogFFp9o"
-fortune_500="1z1lsk2sjAPcxZ0nFInf2cReDjhKEc0bvCF8rch9Ev1Y/edit#gid=0"
+file_id     =  "19Y_Oi5_riecwonPbtxN4sfDntZO62s_vJbXoogFFp9o"
+fortune_500 =  "1z1lsk2sjAPcxZ0nFInf2cReDjhKEc0bvCF8rch9Ev1Y"
 url = "https://docs.google.com/spreadsheets/d/{0}/export?format=csv".format(fortune_500)
 
 r = requests.get(url)
@@ -34,6 +34,7 @@ for row in reader:
         for col in row:
             data[col] = ''
             cols.append(col)
+            print(col)
    else:
         i = 0
         for col in row:
