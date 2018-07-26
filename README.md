@@ -20,3 +20,6 @@ ls my_env
 source my_env/bin/activate
 ```
 To leave the environment, simply type the command deactivate and you will return to your original directory.
+```
+pip3 install requests
+```
