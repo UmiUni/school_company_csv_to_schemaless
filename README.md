@@ -10,3 +10,13 @@ sudo apt-get update
 python3 -V
 sudo apt-get install -y python3-pip
 ```
+To make an env:
+```
+sudo apt-get install -y python3-venv
+mkdir environments
+cd environments
+python3 -m venv my_env
+ls my_env
+source my_env/bin/activate
+```
+To leave the environment, simply type the command deactivate and you will return to your original directory.
