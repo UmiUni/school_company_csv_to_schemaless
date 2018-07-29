@@ -3,8 +3,6 @@ import requests
 import io
 import csv
 
-
-
 # Make sure to give the read permission to anyone having the link, otherwise our python program won't be able to read the file.
 # First, we make a simple GET request on the export url of the spreadhseet using the requests module
 headers={}
@@ -19,52 +17,58 @@ file_id     =  "19Y_Oi5_riecwonPbtxN4sfDntZO62s_vJbXoogFFp9o"
 fortune_500 =  "1z1lsk2sjAPcxZ0nFInf2cReDjhKEc0bvCF8rch9Ev1Y"
 url = "https://docs.google.com/spreadsheets/d/{0}/export?format=csv".format(fortune_500)
 
-r = requests.get(url)
-data = {}
-cols = []
+def getCompanies():
+  r = requests.get(url)
+  data = {}
+  cols = []
+  # Once we have the response, it is easy to read it using the csv module
+  sio = io.StringIO( r.text, newline=None)
+  reader = csv.reader(sio, dialect=csv.excel)
+  rownum = 0
+  
+  for row in reader:
+  # Do something with each row
+    if rownum == 0:
+      for col in row:
+        data[col] = ''
+        cols.append(col)
+        print(col)
+    else:
+      i = 0
+      for col in row:
+        data[cols[i]] = col
+        i = i +1
+      company = data[cols[1]]
+      domain = data[cols[2]][4:]
+      print(company)
+      print(domain)
+      backFillCompanies(domain, company)
+    rownum = rownum + 1
+  
+def backFillCompanies(domain, name):
+  conn = http.client.HTTPConnection("178.128.0.108:3001")
 
-# Once we have the response, it is easy to read it using the csv module
-sio = io.StringIO( r.text, newline=None)
-reader = csv.reader(sio, dialect=csv.excel)
-rownum = 0
+  # payload = "{\n  \"Domain\": \"google.com\",\n  \"Name\": \"Google\"\n}"
+  payload = "{\n  \"Domain\": \""+ domain + "\",\n  \"Name\": \"" + name  + "\"\n}"
 
-for row in reader:
-   # Do something with each row
-   if rownum == 0:
-        for col in row:
-            data[col] = ''
-            cols.append(col)
-            print(col)
-   else:
-        i = 0
-        for col in row:
-            data[cols[i]] = col
-            i = i +1
-        print(data)
-   rownum = rownum + 1
-
-
-# This will print the following output on console:
-'''
-{'Col C': '3', 'Col B': '2', 'Col A': '1', 'Col D': '4'}
-{'Col C': '2', 'Col B': '3', 'Col A': '4', 'Col D': '1'}
-{'Col C': '2', 'Col B': '4', 'Col A': '3', 'Col D': '1'}
-{'Col C': '3', 'Col B': '4', 'Col A': '2', 'Col D': '1'}
-'''
-
-conn = http.client.HTTPConnection("178.128.0.108:3001")
-
-payload = "{\n  \"domain\": \"google.com\",\n  \"name\": \"Google\"\n}"
-
-headers = {
+  headers = {
     'content-type': "application/json",
     'cache-control': "no-cache",
     'postman-token': "705e8d11-b538-c01b-6629-c00669e94314"
-    }
+  }
 
-conn.request("POST", "/add_company", payload, headers)
+  conn.request("POST", "/add_company", payload, headers)
 
-res = conn.getresponse()
-data = res.read()
+  res = conn.getresponse()
+  data = res.read()
 
-print(data.decode("utf-8"))
+  print(data.decode("utf-8"))
+
+# Define main method that calls other functions
+def main():
+  getCompanies()
+
+# Execute main() function
+if __name__ == '__main__':
+    main()
+
