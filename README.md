@@ -1,6 +1,13 @@
+# We host our backfill script in:
+# Jogchat Test digital ocean droplet:
+```
+206.189.76.189
+```
 https://docs.google.com/spreadsheets/d/1z1lsk2sjAPcxZ0nFInf2cReDjhKEc0bvCF8rch9Ev1Y/edit#gid=0
 
-This would require python3 to run:
+
+# To setup a new backfill environment on Ubuntu 16.04 server do the following
+# This would require python3 to run:
 
 https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-ubuntu-16-04
 
