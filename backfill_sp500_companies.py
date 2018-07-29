@@ -38,8 +38,10 @@ def getCompanies():
       for col in row:
         data[cols[i]] = col
         i = i +1
+      index = data[cols[0]]
       company = data[cols[1]]
       domain = data[cols[2]][4:]
+      print(index)
       print(company)
       print(domain)
       backFillCompanies(domain, company)
