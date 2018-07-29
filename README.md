@@ -4,8 +4,8 @@ This would require python3 to run:
 
 https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-ubuntu-16-04
 
-How to read CSV file in Python:
-https://www.alexkras.com/how-to-read-csv-file-in-python/
+Read Google docs spreadsheet using Python:
+http://www.madhur.co.in/blog/2016/05/13/google-docs-spreadsheet.html
 
 
 
