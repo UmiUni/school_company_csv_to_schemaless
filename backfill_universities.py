@@ -16,8 +16,10 @@ lines = []
 file_id     =  "19Y_Oi5_riecwonPbtxN4sfDntZO62s_vJbXoogFFp9o"
 universities =  "1BjF5J_Ki5_DiDBXWqMeoXVRlfKwxpLe71RmjBhlZdlg"
 url = "https://docs.google.com/spreadsheets/d/{0}/export?format=csv".format(universities)
+universityList = []
+global universityListSize
 
-def getUniversities():
+def getUniversities0():
   r = requests.get(url)
   data = {}
   cols = []
@@ -45,6 +47,39 @@ def getUniversities():
       print(domain)
       backFillUniversities(domain, university)
     rownum = rownum + 1
+
+def getUniversitiesTest():
+  r = requests.get(url)
+  data = {}
+  cols = []
+  # Once we have the response, it is easy to read it using the csv module
+  sio = io.StringIO( r.text, newline=None)
+  reader = csv.reader(sio, dialect=csv.excel)
+  rownum = 0
+  
+  for row in reader:
+  # Do something with each row
+    if rownum == 0:
+      for col in row:
+        data[col] = ''
+        cols.append(col)
+        print(col)
+    else:
+      i = 0
+      for col in row:
+        data[cols[i]] = col
+        i = i +1
+      university = data[cols[1]]
+      domain = data[cols[2]][7:]
+      #print(data[cols[0]])
+      #print(university)
+      #print(domain)
+      tuple = [rownum, university, domain]
+      universityList.append(tuple)
+    rownum = rownum + 1
+    global universityListSize
+    universityListSize = rownum
+    backFillUniversitiesBatch(0,50)
   
 def backFillUniversities(domain, name):
   conn = http.client.HTTPConnection("178.128.0.108:3001")
@@ -65,9 +100,41 @@ def backFillUniversities(domain, name):
 
   print(data.decode("utf-8"))
 
+def backFillUniversitiesBatch(startPos, num):
+  conn = http.client.HTTPConnection("178.128.0.108:3001")
+  payloadStart = "{\n\t\"Entries\":[\n\t"
+  payloadUniversity0 = "{\n  \"Domain\": \""
+  payloadUniversity1 = "\",\n       \"Name\": \""
+  payloadUniversity2 ="\"\n    } "
+  payloadConnector = ",\n  "
+  payloadEnd = "  ]\n}"
+  payloadAll = payloadStart
+  endPos = startPos+num
+  for i in range(startPos,endPos,1):
+    if i < universityListSize - 1:
+      payload = payloadUniversity0 + universityList[i][2] + payloadUniversity1 + universityList[i][1] + payloadUniversity2
+      if i!= endPos - 1:
+        payload = payload + payloadConnector
+      payloadAll += payload
+  payloadAll += payloadEnd
+  print(payloadAll)
+  msg_string = "Backfilling index range {} -> {}..."
+  print(msg_string.format(startPos,endPos))
+  headers = {
+    'Content-Type': "application/json",
+    'Cache-Control': "no-cache",
+    'Postman-Token': "0364c8c2-e459-4d17-a665-85d2f3a63482"
+  }
+
+  conn.request("POST", "/add_university_batch", payloadAll, headers)
+  res = conn.getresponse()
+  data = res.read()
+  # print(data.decode("utf-8"))
+
+
 # Define main method that calls other functions
 def main():
-  getUniversities()
+  getUniversitiesTest()
 
 # Execute main() function
 if __name__ == '__main__':

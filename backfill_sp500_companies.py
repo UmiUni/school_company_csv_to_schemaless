@@ -20,8 +20,82 @@ url = "https://docs.google.com/spreadsheets/d/{0}/export?format=csv".format(fort
 companyList = [] 
 
 global companyListSize
+def putCompaniesTest(num):
+  curIndex = 0
+  backFillCompanies(curIndex, num) 
+ 
+def getCompaniesTest():
+  r = requests.get(url)
+  data = {}
+  cols = []
+  # Once we have the response, it is easy to read it using the csv module
+  sio = io.StringIO( r.text, newline=None)
+  reader = csv.reader(sio, dialect=csv.excel)
+  rownum = 0
+  
+  for row in reader:
+  # Do something with each row
+    if rownum == 0:
+      for col in row:
+        data[col] = ''
+        cols.append(col)
+        print(col)
+    else:
+      i = 0
+      for col in row:
+        data[cols[i]] = col
+        i = i +1
+      index = data[cols[0]]
+      company = data[cols[1]]
+      domain = data[cols[2]][4:]
+      #print(index)
+      #print(company)
+      #print(domain)
+      tuple = [index, company, domain]
+      lines.append(tuple) 
+      companyList.append(tuple)
+    rownum = rownum + 1
+  global companyListSize
+  companyListSize = rownum
+  putCompaniesTest(50)
 
-def getCompanies():
+
+def getCompanies1():
+  r = requests.get(url)
+  data = {}
+  cols = []
+  # Once we have the response, it is easy to read it using the csv module
+  sio = io.StringIO( r.text, newline=None)
+  reader = csv.reader(sio, dialect=csv.excel)
+  rownum = 0
+  
+  for row in reader:
+  # Do something with each row
+    if rownum == 0:
+      for col in row:
+        data[col] = ''
+        cols.append(col)
+        print(col)
+    else:
+      i = 0
+      for col in row:
+        data[cols[i]] = col
+        i = i +1
+      index = data[cols[0]]
+      company = data[cols[1]]
+      domain = data[cols[2]][4:]
+      #print(index)
+      #print(company)
+      #print(domain)
+      tuple = [index, company, domain]
+      lines.append(tuple) 
+      companyList.append(tuple)
+    rownum = rownum + 1
+  global companyListSize
+  companyListSize = rownum
+  putCompanies(100)
+
+def getCompanies2():
   r = requests.get(url)
   data = {}
   cols = []
@@ -117,7 +191,7 @@ def backFillCompany(domain, name):
 
 # Define main method that calls other functions
 def main():
-  getCompanies()
+  getCompaniesTest()
 
 # Execute main() function
 if __name__ == '__main__':
