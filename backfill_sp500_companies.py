@@ -57,16 +57,17 @@ def getCompanies():
 
 def putCompanies(num):
   curIndex = 0
+  print("curIndex:")
+  print(curIndex)
   while curIndex < companyListSize : 
-    print("curIndex:")
-    print(curIndex)
     if curIndex + num <= companyListSize :
-      backFillCompanies(curIndex, num) 
+      backFillCompanies(curIndex, curIndex+num) 
     else:
       backFillCompanies(curIndex, companyListSize)
     curIndex += num
 
 def backFillCompanies(startPos, num):
+  print("In backFillCompanies")
   conn = http.client.HTTPConnection("178,128,0,108:3001")
   payloadStart = "{\n\t\"Entries\":[\n\t"
   payloadCompanies0 = "{\n  \"Domain\": \"" 
