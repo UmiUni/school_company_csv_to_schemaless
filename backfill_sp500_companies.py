@@ -18,7 +18,8 @@ fortune_500 =  "1z1lsk2sjAPcxZ0nFInf2cReDjhKEc0bvCF8rch9Ev1Y"
 url = "https://docs.google.com/spreadsheets/d/{0}/export?format=csv".format(fortune_500)
 
 companyList = [] 
-companyListSize = 0
+
+global companyListSize
 
 def getCompanies():
   r = requests.get(url)
@@ -47,52 +48,53 @@ def getCompanies():
       #print(index)
       #print(company)
       #print(domain)
-      tuple = (index, company, domain)
+      tuple = [index, company, domain]
       lines.append(tuple) 
+      companyList.append(tuple)
     rownum = rownum + 1
+  global companyListSize
   companyListSize = rownum
-  print("companyListSize:")
-  print(companyListSize)
   putCompanies(100)
 
 def putCompanies(num):
   curIndex = 0
-  print("curIndex:")
-  print(curIndex)
   while curIndex < companyListSize : 
     if curIndex + num <= companyListSize :
-      backFillCompanies(curIndex, curIndex+num) 
+      backFillCompanies(curIndex, num) 
     else:
-      backFillCompanies(curIndex, companyListSize)
+      backFillCompanies(curIndex, num)
     curIndex += num
 
 def backFillCompanies(startPos, num):
-  print("In backFillCompanies")
-  conn = http.client.HTTPConnection("178,128,0,108:3001")
+  conn = http.client.HTTPConnection("178.128.0.108:3001")
   payloadStart = "{\n\t\"Entries\":[\n\t"
   payloadCompanies0 = "{\n  \"Domain\": \"" 
   payloadCompanies1 = "\",\n       \"Name\": \""
   payloadCompanies2 ="\"\n    } "
   payloadConnector = ",\n  " 
   payloadEnd = "  ]\n}"
+  payloadAll = payloadStart
   endPos = startPos+num
   for i in range(startPos,endPos,1):
-    if i < companyListSize:
-      payload = payloadStart + paylaodCompanies0 + payloadCompanies[i][2] + payloadCompanies1 + payloadCompanies[i][1] + payloadCompanies2 
+    if i < companyListSize - 1:
+      payload = payloadCompanies0 + companyList[i][2] + payloadCompanies1 + companyList[i][1] + payloadCompanies2 
       if i!= endPos - 1: 
         payload = payload + payloadConnector
-      payload = payload + payloadEnd
-      print(payload)
-      headers = {
-        'Content-Type': "application/json",
-        'Cache-Control': "no-cache",
-        'Postman-Token': "0364c8c2-e459-4d17-a665-85d2f3a63482"
-      }
+      payloadAll += payload
+  payloadAll += payloadEnd
+  print(payloadAll)
+  msg_string = "Backfilling index range {} -> {}..."
+  print(msg_string.format(startPos,endPos))
+  headers = {
+    'Content-Type': "application/json",
+    'Cache-Control': "no-cache",
+    'Postman-Token': "0364c8c2-e459-4d17-a665-85d2f3a63482"
+  }
 
-      conn.request("POST", "add_company_batch", payload, headers)
-      res = conn.getresponse()
-      data = res.read()
-      print(data.decode("utf-8"))
+  conn.request("POST", "/add_company_batch", payloadAll, headers)
+  res = conn.getresponse()
+  data = res.read()
+  # print(data.decode("utf-8"))
 
 def backFillCompany(domain, name):
   conn = http.client.HTTPConnection("178.128.0.108:3001")
