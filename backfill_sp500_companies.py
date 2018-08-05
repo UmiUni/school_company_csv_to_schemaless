@@ -17,6 +17,9 @@ file_id     =  "19Y_Oi5_riecwonPbtxN4sfDntZO62s_vJbXoogFFp9o"
 fortune_500 =  "1z1lsk2sjAPcxZ0nFInf2cReDjhKEc0bvCF8rch9Ev1Y"
 url = "https://docs.google.com/spreadsheets/d/{0}/export?format=csv".format(fortune_500)
 
+companyList = [] 
+companyListSize = 0
+
 def getCompanies():
   r = requests.get(url)
   data = {}
@@ -41,13 +44,56 @@ def getCompanies():
       index = data[cols[0]]
       company = data[cols[1]]
       domain = data[cols[2]][4:]
-      print(index)
-      print(company)
-      print(domain)
-      backFillCompanies(domain, company)
+      #print(index)
+      #print(company)
+      #print(domain)
+      tuple = (index, company, domain)
+      lines.append(tuple) 
     rownum = rownum + 1
-  
-def backFillCompanies(domain, name):
+  companyListSize = rownum
+  print("companyListSize:")
+  print(companyListSize)
+  putCompanies(100)
+
+def putCompanies(num):
+  curIndex = 0
+  while curIndex < companyListSize : 
+    print("curIndex:")
+    print(curIndex)
+    if curIndex + num <= companyListSize :
+      backFillCompanies(curIndex, num) 
+    else:
+      backFillCompanies(curIndex, companyListSize)
+    curIndex += num
+
+def backFillCompanies(startPos, num):
+  conn = http.client.HTTPConnection("178,128,0,108:3001")
+  payloadStart = "{\n\t\"Entries\":[\n\t"
+  payloadCompanies0 = "{\n  \"Domain\": \"" 
+  payloadCompanies1 = "\",\n       \"Name\": \""
+  payloadCompanies2 ="\"\n    } "
+  payloadConnector = ",\n  " 
+  payloadEnd = "  ]\n}"
+  endPos = startPos+num
+  for i in range(startPos,endPos,1):
+    if i < companyListSize:
+      payload = payloadStart + paylaodCompanies0 + payloadCompanies[i][2] + payloadCompanies1 + payloadCompanies[i][1] + payloadCompanies2 
+      if i!= endPos - 1: 
+        payload = payload + payloadConnector
+      payload = payload + payloadEnd
+      print(payload)
+      headers = {
+        'Content-Type': "application/json",
+        'Cache-Control': "no-cache",
+        'Postman-Token': "0364c8c2-e459-4d17-a665-85d2f3a63482"
+      }
+
+      conn.request("POST", "add_company_batch", payload, headers)
+      res = conn.getresponse()
+      data = res.read()
+      print(data.decode("utf-8"))
+
+def backFillCompany(domain, name):
   conn = http.client.HTTPConnection("178.128.0.108:3001")
 
   # payload = "{\n  \"Domain\": \"google.com\",\n  \"Name\": \"Google\"\n}"
